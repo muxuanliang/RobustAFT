@@ -1,10 +1,3 @@
-library(matrixStats)
-library(survival)
-library(glmnet)
-library(rqPen)  ###rq.lasso.fit QICD
-library(ECOSolveR)
-library(Matrix)
-
 ###
 bje_sgl <- function(x, y, index, lam1, lam2, standardize=TRUE, method=c("square", "absolute", "huber", "tukey"), k_h=1.345, k_t=4.685, maxit_em=100, eps=1e-5){
 
@@ -41,8 +34,8 @@ bje_sgl <- function(x, y, index, lam1, lam2, standardize=TRUE, method=c("square"
     newy <- y.order[state.order==1]
     newweight <- newy * 0 + 1
 
-    eta.surv <- Surv(1:length(eta.order), state.order)
-    km.eta <- survfit(eta.surv~1)
+    eta.surv <- survival::Surv(1:length(eta.order), state.order)
+    km.eta <- survival::survfit(eta.surv~1)
     weight.low <- km.eta$surv
     weight.up <- diff(-c(1, km.eta$surv))
 
