@@ -101,9 +101,6 @@ linear_sgl = function( X, Y, weights, index, lam1, lam2, standardize=FALSE, maxi
 
 
 ######the absolute loss + SGL
-library(ECOSolveR)
-library(Matrix)
-
 abs_socp  <-  function(X, Y, w, index, lam1) {
 
   #X <-  cbind(x)
@@ -177,7 +174,7 @@ abs_socp  <-  function(X, Y, w, index, lam1) {
   }
 
   #fit <- ECOS_csolve(c=f,G=G,h=h,dims=dims)
-  fit <- ECOS_csolve(c=f,G=G,h=h,dims=dims,control=ecos.control(maxit = 200L, feastol = 1e-08, reltol = 1e-08,abstol = 1e-08))
+  fit <- ECOSolveR::ECOS_csolve(c=f,G=G,h=h,dims=dims,control=ecos.control(maxit = 200L, feastol = 1e-08, reltol = 1e-08,abstol = 1e-08))
   sol <- fit$x
   coef <- sol[(n+1):(n+p)]
   list(coef=coef)
@@ -268,7 +265,7 @@ hbtk_cda_sgl <- function(X, Y, weights, index, lam1, lam2, standardize=TRUE, met
   #beta <- rep(1,p)
   #a0 <- 0
 
-  fit <- rq.lasso.fit(x,y,lambda=0,tau=0.5,intercept=T,weights=w,method="br")
+  fit <- rqPen::rq.lasso.fit(x,y,lambda=0,tau=0.5,intercept=T,weights=w,method="br")
   beta <- fit$coefficients[-1]
   a0 <- fit$coefficients[1]
 
