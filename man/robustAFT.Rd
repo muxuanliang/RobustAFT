@@ -53,6 +53,8 @@ This function implement the B-J estimator with lasso or group lasso penalty
 }
 \examples{
 
+library(MASS)
+library(survival)
 ###sample size
 nobs <- 200
 
@@ -66,7 +68,7 @@ index <- ceiling(1:p/5)
 
 ###covariance structure
 pau <- 0.5
-ov_x <- pau*matrix(1,p,p)
+cov_x <- pau*matrix(1,p,p)
 diag(cov_x) <- 1
 
 ###error distribution and signal to-noise ratio
