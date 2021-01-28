@@ -1,11 +1,15 @@
 Package: RobustAFT
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Robust Estimation of AFT Model with High-dimensional Covariates
+Version: 1.0.0
+Author@R: c(person("Yi", "Li", email = "first.last@example.com",
+                  role = c("aut","cre")), person("Muxuan", "Liang", email = "miang@fredhutch.org",
+                  role = "aut"))
+Author: Yi Li [aut, cre], Muxuan Liang [aut]
+Maintainer: Yi Li <first.last@example.com>
+Description: A unified Expectation-Maximization approach combined with the L1-norm penalty to perform variable selection and obtain parameter estimation simultaneously for the accelerated failure time model with right-censored survival data.
+Depends: survival, rqPen, ECOSolveR
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 7.1.1

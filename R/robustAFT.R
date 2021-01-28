@@ -1,8 +1,117 @@
+#' This function implement the B-J estimator with lasso or group lasso penalty
+#'
+#' @param surv_obj The output of the Survival Object created by survival::Surv. It includes the time and event status.
+#' @param covariate A p-dimensional covariate. Each row is an observation; each col represents a covariate.
+#' @param loss Type of the loss functions available. Include 'square' for square loss, 'absolute' for absolute loss, 'huber' for huber loss, 'tukey' for tukey loss.
+#' @param penalty A Bool variable. True represents a penalty will be added; FALSE represents no penalty. The type of the penalty depends on whether group_index is specified.
+#' @param group_index A p-dimensional Vector. The same index represents the same group. For example, group_index=c(1,1,2,2,2) represents that there are two groups.
+#' @param lambda_lasso A non-negative numeric. The parameter for the lasso penalty.
+#' @param lambda_group A non-negative numeric. The parameter for the grouped lasso penalty.
+#' @param standardize A Bool variable. if TRUE, the covariate will be standardized druing the calculation.
+#' @param ... Other parameters related to the algorithm. For example, maxit determine the maximum iteration allowed.
+#' @return A list
+#' \describe{
+#' \item{penalty_type}{Type of the penalty}
+#' \item{beta}{Estimated coefficients}
+#' \item{beta_mean}{}
+#' \item{beta_local}{}
+#' \item{beta_refit}{Estimated coefficients if refitted}
+#' \item{beta_refit_mean}{}
+#' \item{select}{Indicators of selected coefficients}
+#' \item{iter}{Number of iterations until convergence}
+#' }
+#' @references
+#' @examples
+#'
+#' ###sample size
+#'nobs <- 200
+#'
+#'###regression parameters
+#'p <- 30
+#'alpha <- 1
+#'beta <- c(1,1.5,2,2.5,3,array(0,10),1,-1,1,-1,1,array(0,10))
+#'
+#' ###group structure
+#'index <- ceiling(1:p/5)
+#'
+#' ###covariance structure
+#'pau <- 0.5
+#'ov_x <- pau*matrix(1,p,p)
+#'diag(cov_x) <- 1
+#'
+#'###error distribution and signal to-noise ratio
+#'error <- 4
+#'snr <- 5
+#'sigma <- as.numeric(sqrt(t(as.matrix(beta))%*%cov_x%*%as.matrix(beta)/snr/23.4))
+#'m <- 100
+#'set.seed(10*m)
+#'
+#'###generate covariates
+#'x <- mvrnorm(nobs, rep(0,p), cov_x)
+#'if (error == 1){
+#'  epsilon <- rnorm(nobs, 0, 1)
+#'} else if (error == 2){
+#'  epsilon <- rt(nobs, 3)
+#'} else if (error == 3){
+#'  epsilon <- rdoublex(nobs)
+#'} else if (error == 4){
+#'  epsilon <- NULL
+#'  for (j in 1:nobs){
+#'    z <- rbinom(1, 1, 0.9)
+#'    if (z==1) {epsilon[j] <- rnorm(1, 0, 1)}
+#'    else {epsilon[j] <- rnorm(1, 0, 15) }
+#'  }
+#'}
+#'epsilon <- sigma * epsilon
+#'tlogt.expect <- x %*% beta + alpha
+#'tlogt <- tlogt.expect + epsilon
+#'tau <- 950
+#'tc <- runif(nobs, min = 0, max = tau)
+#'tlogc <- log(tc)
+#'censor <- sum(tlogc < tlogt)/nobs
+#'logt <- pmin(tlogt, tlogc)
+#'indi <- (tlogt <= tlogc)
+#'y <- Surv(logt, indi)
+#'
+#'###square loss
+#'#oracle
+#'olsfit1 <- robustAFT(covariate=x[,abs(beta) > 1e-5], surv_obj=y, loss="square", penalty=FALSE)
+#'#lasso
+#'fitlasso1 <- robustAFT(covariate=x, surv_obj=y, loss="square", lambda_lasso=60, standardize=TRUE)
+#'#sgl
+#'fitsgl1 <- robustAFT(covariate=x, surv_obj=y, group_index = index, lambda_lasso=30 , lambda_group=20, loss="square")
+#'
+#'###huber loss
+#'#oracle
+#'olsfit3 <- robustAFT(covariate=x[,abs(beta) > 1e-5], surv_obj=y, loss="huber", penalty=FALSE)
+#'#lasso
+#'fitlasso3 <- robustAFT(covariate=x, surv_obj=y, loss="huber", lambda_lasso=25, standardize=TRUE)
+#'#sgl
+#'fitsgl3 <- robustAFT(covariate=x, surv_obj=y, group_index = index, lambda_lasso=20 , lambda_group=5, loss="huber")
+#'
+#'###absolute loss
+#'#oracle
+#'olsfit2 <- robustAFT(covariate=x[,abs(beta) > 1e-5], surv_obj=y, loss="absolute", penalty=FALSE)
+#'#lasso
+#'fitlasso2 <- robustAFT(covariate=x, surv_obj=y, loss="absolute", lambda_lasso=20, standardize=TRUE)
+#'#sgl
+#'fitsgl2 <- robustAFT(covariate=x, surv_obj=y, group_index = index, lambda_lasso=20 , lambda_group=5, loss="absolute")
+#'
+#'###tukey loss
+#'#oracle
+#'olsfit4 <- robustAFT(covariate=x[,abs(beta) > 1e-5], surv_obj=y, loss="tukey", penalty=FALSE)
+#'#lasso
+#'fitlasso4 <- robustAFT(covariate=x, surv_obj=y, loss="tukey", lambda_lasso=20, standardize=TRUE)
+#'#sgl
+#'fitsgl4 <- robustAFT(covariate=x, surv_obj=y, group_index = index, lambda_lasso=20 , lambda_group=5, loss="tukey")
+#'
+#' @export
+
 robustAFT <- function(surv_obj, covariate, loss = 'square', penalty = TRUE, group_index = NULL, lambda_lasso = 60, lambda_group = NULL, standardize = TRUE,...){
   # check
   penalty_type <- 'lasso'
   if (!is.null(group_index)){
-    stopifnot(NROW(covariate)==length(group_index))
+    stopifnot(NCOL(covariate)==length(group_index))
     stopifnot(!is.null(lambda_group))
     penalty_type <- 'glasso'
   }

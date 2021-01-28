@@ -30,7 +30,7 @@ huber_cda <- function(X,Y,lambda,weights,method=c("huber", "tukey"),maxit=10^3,e
   iter <- 0
   dif <- 1
 
-  fit <- rq.lasso.fit(x,y,lambda=0,tau=0.5,intercept=T,weights=w,method="br")
+  fit <- rqPen::rq.lasso.fit(x,y,lambda=0,tau=0.5,intercept=T,weights=w,method="br")
   beta <- fit$coefficients[-1]
   a0 <- fit$coefficients[1]
 
@@ -112,8 +112,8 @@ bje_ly <- function(x, y, method=c("square", "absolute", "huber", "tukey", "quant
     newy <- y.order[state.order==1]
     newweight <- newy * 0 + 1
 
-    eta.surv <- Surv(1:length(eta.order), state.order)
-    km.eta <- survfit(eta.surv~1)
+    eta.surv <- survival::Surv(1:length(eta.order), state.order)
+    km.eta <- survival::survfit(eta.surv~1)
     weight.low <- km.eta$surv
     weight.up <- diff(-c(1, km.eta$surv))
 
@@ -139,7 +139,7 @@ bje_ly <- function(x, y, method=c("square", "absolute", "huber", "tukey", "quant
 
     if (method == "square"){
 
-      fit <- glmnet(newx[,-1], newy, family="gaussian", weights=newweight, alpha=1, lambda=lambda/2/sum(newweight), standardize=standardize, intercept=T)
+      fit <- glmnet::glmnet(newx[,-1], newy, family="gaussian", weights=newweight, alpha=1, lambda=lambda/2/sum(newweight), standardize=standardize, intercept=T)
       beta <- c(fit$a0, as.numeric(fit$beta))
 
       dif <- min(apply(beta_store, 2, function(t){max(abs(beta - t))}))
@@ -150,7 +150,7 @@ bje_ly <- function(x, y, method=c("square", "absolute", "huber", "tukey", "quant
 
     } else if (method == "absolute"){
 
-      fit <- rq.lasso.fit(newx[,-1], newy, lambda=lambda/2/length(newweight), tau=0.5,intercept=T, weights=newweight,method="br")
+      fit <- rqPen::rq.lasso.fit(newx[,-1], newy, lambda=lambda/2/length(newweight), tau=0.5,intercept=T, weights=newweight,method="br")
       beta <- fit$coefficients
 
       dif <- min(apply(beta_store, 2, function(t){max(abs(beta - t))}))
@@ -183,8 +183,8 @@ bje_ly <- function(x, y, method=c("square", "absolute", "huber", "tukey", "quant
 
     }
 
-    print(iter)
-    print(dif)
+    #print(iter)
+    #print(dif)
   }
 
   if (dif < eps){

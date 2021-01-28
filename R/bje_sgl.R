@@ -107,8 +107,8 @@ bje_sgl <- function(x, y, index, lam1, lam2, standardize=TRUE, method=c("square"
       beta_pre <- beta
 
     }
-    print(iter)
-    print(dif)
+    #print(iter)
+    #print(dif)
   }
 
   if (dif < eps){
