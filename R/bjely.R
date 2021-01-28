@@ -43,7 +43,7 @@ huber_cda <- function(X,Y,lambda,weights,method=c("huber", "tukey"),maxit=10^3,e
 
     for(j in 1:p){
       r <- (y - a0 - x%*%as.matrix(beta))
-      sigma <- weightedMad(r,w)
+      sigma <- matrixStats::weightedMad(r,w)
       r <- r/sigma
 
       if (method == "huber"){
@@ -55,7 +55,7 @@ huber_cda <- function(X,Y,lambda,weights,method=c("huber", "tukey"),maxit=10^3,e
     }
 
     r <- y - a0 - x%*%as.matrix(beta)
-    sigma <- weightedMad(r,w)
+    sigma <- matrixStats::weightedMad(r,w)
     r <- r/sigma
 
     if (method == "huber"){

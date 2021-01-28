@@ -8,7 +8,7 @@ Author@R: c(person("Yi", "Li", email = "first.last@example.com",
 Author: Yi Li [aut, cre], Muxuan Liang [aut]
 Maintainer: Yi Li <first.last@example.com>
 Description: A unified Expectation-Maximization approach combined with the L1-norm penalty to perform variable selection and obtain parameter estimation simultaneously for the accelerated failure time model with right-censored survival data.
-Depends: survival, rqPen, ECOSolveR
+Depends: survival, rqPen, ECOSolveR, matrixStats
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
