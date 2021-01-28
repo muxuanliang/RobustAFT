@@ -12,12 +12,11 @@
 #' @return A list
 #' \describe{
 #' \item{penalty_type}{Type of the penalty}
-#' \item{beta}{Estimated coefficients}
-#' \item{beta_mean}{}
-#' \item{beta_local}{}
-#' \item{beta_refit}{Estimated coefficients if refitted}
-#' \item{beta_refit_mean}{}
-#' \item{select}{Indicators of selected coefficients}
+#' \item{intercept}{Estimated intercept}
+#' \item{coef}{Estimated coefficients}
+#' \item{nonZeroIndex}{Indicators of non-zero coefficients}
+#' \item{coef_path}{Coefficients after convergence (including intercept)}
+#' \item{coef_refit}{Refitted coefficients wihtout penalty based on the selected non-zero coefficients (including intercept)}
 #' \item{iter}{Number of iterations until convergence}
 #' }
 #' @references
@@ -115,7 +114,7 @@ robustAFT <- function(surv_obj, covariate, loss = 'square', penalty = TRUE, grou
   if (!is.null(group_index)){
     stopifnot(NCOL(covariate)==length(group_index))
     stopifnot(!is.null(lambda_group))
-    penalty_type <- 'glasso'
+    penalty_type <- 'sglasso'
   }
   if (penalty == FALSE){
     penalty_type <- 'refit'
@@ -124,7 +123,8 @@ robustAFT <- function(surv_obj, covariate, loss = 'square', penalty = TRUE, grou
 
   fit <- switch(penalty_type,
                 lasso=bje_ly(covariate, surv_obj, method=loss, lambda=lambda_lasso, standardize=standardize, ...),
-                glasso=bje_sgl(covariate, surv_obj, group_index, lambda_lasso , lambda_group, method=loss, standardize=standardize, ...),
+                sglasso=bje_sgl(covariate, surv_obj, group_index, lambda_lasso , lambda_group, method=loss, standardize=standardize, ...),
                 refit=bje_refit(covariate, surv_obj, method=loss))
-  fit
+
+  return(list(penalty_type = penalty_type, intercept=fit$beta[1], coef=fit$beta[-1], nonZeroIndex=fit$select, coef_path=fit$beta_local, coef_refit=fit$beta_refit, iter=fit$iter))
 }

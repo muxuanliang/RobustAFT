@@ -39,12 +39,11 @@ robustAFT(
 A list
 \describe{
 \item{penalty_type}{Type of the penalty}
-\item{beta}{Estimated coefficients}
-\item{beta_mean}{}
-\item{beta_local}{}
-\item{beta_refit}{Estimated coefficients if refitted}
-\item{beta_refit_mean}{}
-\item{select}{Indicators of selected coefficients}
+\item{intercept}{Estimated intercept}
+\item{coef}{Estimated coefficients}
+\item{nonZeroIndex}{Indicators of non-zero coefficients}
+\item{coef_path}{Coefficients after convergence (including intercept)}
+\item{coef_refit}{Refitted coefficients wihtout penalty based on the selected non-zero coefficients (including intercept)}
 \item{iter}{Number of iterations until convergence}
 }
 }
