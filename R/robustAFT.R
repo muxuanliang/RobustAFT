@@ -24,6 +24,7 @@
 #'
 #'library(MASS)
 #'library(survival)
+#'library(RobustAFT)
 #' ###sample size
 #'nobs <- 200
 #'

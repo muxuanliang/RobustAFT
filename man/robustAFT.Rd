@@ -54,6 +54,7 @@ This function implement the B-J estimator with lasso or group lasso penalty
 
 library(MASS)
 library(survival)
+library(RobustAFT)
 ###sample size
 nobs <- 200
 
