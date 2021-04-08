@@ -2,6 +2,10 @@
 
 A unified Expectation-Maximization approach combined with the L1-norm (or sparse group lasso) penalty to perform variable selection and obtain parameter estimation simultaneously for the accelerated failure time model with right-censored survival data. 
 
+# Requirment on R version
+
+We require the R version >=4.0.3 due to another package used in this package.
+
 # Setup
 To install the most up-to-date version, run the following command in R
 ```
